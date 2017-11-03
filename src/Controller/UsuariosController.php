@@ -29,6 +29,20 @@ class UsuariosController extends AppController
         $this->set('_serialize', ['usuarios']);
     }
 
+    
+    public function login()
+    {   
+        if ($this->request->is('post')) {
+            $user = $this->Auth->identify();
+        }
+    }
+
+    public function logout()
+    {
+        return $this->redirect($this->Auth->logout());
+    }
+    
+    
     /**
      * View method
      *
