@@ -42,7 +42,7 @@
         </tr>
         <tr>
             <th scope="row"><?= __('Calle') ?></th>
-            <td><?= $direccion->has('calle') ? $this->Html->link($direccion->calle->, ['controller' => 'Calles', 'action' => 'view', $direccion->calle->]) : '' ?></td>
+            <td><?= $direccion->has('calle') ? $this->Html->link($direccion->calle->id, ['controller' => 'Calles', 'action' => 'view', $direccion->calle->id]) : '' ?></td>
         </tr>
         <tr>
             <th scope="row"><?= __('Barrio') ?></th>

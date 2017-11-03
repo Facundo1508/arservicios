@@ -44,7 +44,7 @@
                 <td><?= $direccion->has('provincia') ? $this->Html->link($direccion->provincia->id, ['controller' => 'Provincias', 'action' => 'view', $direccion->provincia->id]) : '' ?></td>
                 <td><?= $direccion->has('departamento') ? $this->Html->link($direccion->departamento->id, ['controller' => 'Departamentos', 'action' => 'view', $direccion->departamento->id]) : '' ?></td>
                 <td><?= $direccion->has('distrito') ? $this->Html->link($direccion->distrito->id, ['controller' => 'Distritos', 'action' => 'view', $direccion->distrito->id]) : '' ?></td>
-                <td><?= $direccion->has('calle') ? $this->Html->link($direccion->calle->, ['controller' => 'Calles', 'action' => 'view', $direccion->calle->]) : '' ?></td>
+                <td><?= $direccion->has('calle') ? $this->Html->link($direccion->calle->id, ['controller' => 'Calles', 'action' => 'view', $direccion->calle->id]) : '' ?></td>
                 <td><?= $this->Number->format($direccion->numero) ?></td>
                 <td><?= h($direccion->barrio) ?></td>
                 <td><?= h($direccion->manzana) ?></td>
