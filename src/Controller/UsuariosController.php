@@ -2,6 +2,8 @@
 namespace App\Controller;
 
 use App\Controller\AppController;
+use Cake\Event\Event;
+use Cake\ORM\TableRegistry;
 
 /**
  * Usuarios Controller
@@ -13,6 +15,32 @@ use App\Controller\AppController;
 class UsuariosController extends AppController
 {
 
+    public function isAuthorized($user)
+    {   
+        if (isset($user['rol']) && $user['rol'] === 'usuario')
+        {
+            if(in_array($this->request->action, ['logout', 'servicio', 'usuario']))
+            {
+                return true;
+            }
+        } elseif (!isset($user['rol'])) {
+           if(in_array($this->request->action, ['registro', 'logout', 'login']))
+            {
+                return true;
+            }
+        }
+
+        return parent::isAuthorized($user);
+    }
+    
+    public function beforeFilter(Event $event)
+    {
+        parent::beforeFilter($event);
+        // Allow users to register and logout.
+        // You should not add the "login" action to allow list. Doing so would
+        // cause problems with normal functioning of AuthComponent.
+        $this->Auth->allow(['logout', 'registro']);
+    }
     /**
      * Index method
      *
@@ -34,6 +62,14 @@ class UsuariosController extends AppController
     {   
         if ($this->request->is('post')) {
             $user = $this->Auth->identify();
+            if ($user && $user['activo']) {
+                $this->Auth->setUser($user);
+                return $this->redirect($this->Auth->redirectUrl());
+            } elseif ($user && ($user['activo'] == false)) {
+                $this->Flash->error(__('El Usuario aun no está activado.'));   
+            } else {
+                $this->Flash->error(__('Nombre de usuario o contraseña incorrectos'));
+            }
         }
     }
 

@@ -43,13 +43,42 @@ class AppController extends Controller
 
         $this->loadComponent('RequestHandler');
         $this->loadComponent('Flash');
+        $this->loadComponent('Auth', [
+            'authenticate' => [
+                'Form' => [
+                    'fields' => [
+                        'username' => 'nombre_usuario',
+                        'password' => 'contraseña'
+                    ]
+                ]
+            ],
+            'loginAction' => [
+                'controller' => 'Usuarios',
+                'action' => 'login'
+            ],
+             // If unauthorized, return them to page they were just on
+            'unauthorizedRedirect' => $this->referer()
+        ]);
 
-        /*
-         * Enable the following components for recommended CakePHP security settings.
-         * see https://book.cakephp.org/3.0/en/controllers/components/security.html
-         */
-        //$this->loadComponent('Security');
-        //$this->loadComponent('Csrf');
+        // Allow the display action so our PagesController
+        // continues to work. Also enable the read only actions.
+        $this->Auth->allow(['index']);
+    }
+    
+    
+    public function isAuthorized($usuario)
+    {
+        // Admin can access every action
+        if (isset($usuario['rol']) && $usuario['rol'] === 'admin') 
+        {
+            return true;
+        }
+        return false;
+    }
+
+    public function beforeFilter(Event $event)
+    {   
+        $this->set('current_user', $this->Auth->user());
     }
 
     /**
