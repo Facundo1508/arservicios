@@ -1,25 +1,11 @@
-<?php
-/**
- * @var \App\View\AppView $this
- * @var \App\Model\Entity\Usuario $usuario
- */
-?>
-<nav class="large-3 medium-4 columns" id="actions-sidebar">
-    <ul class="side-nav">
-        <li class="heading"><?= __('Actions') ?></li>
-        <li><?= $this->Html->link(__('List Usuarios'), ['action' => 'index']) ?></li>
-        <li><?= $this->Html->link(__('List Rols'), ['controller' => 'Rols', 'action' => 'index']) ?></li>
-        <li><?= $this->Html->link(__('New Rol'), ['controller' => 'Rols', 'action' => 'add']) ?></li>
-        <li><?= $this->Html->link(__('List Generos'), ['controller' => 'Generos', 'action' => 'index']) ?></li>
-        <li><?= $this->Html->link(__('New Genero'), ['controller' => 'Generos', 'action' => 'add']) ?></li>
-        <li><?= $this->Html->link(__('List Usuarioservicios'), ['controller' => 'Usuarioservicios', 'action' => 'index']) ?></li>
-        <li><?= $this->Html->link(__('New Usuarioservicio'), ['controller' => 'Usuarioservicios', 'action' => 'add']) ?></li>
-    </ul>
-</nav>
-<div class="usuarios form large-9 medium-8 columns content">
-    <?= $this->Form->create($usuario) ?>
+<div class="row">
+    <div class="col-md-6 col-md-offset-3">
+    	<div class="page-header">
+    		<h2>Crear usuario</h2>
+    	</div>
+         <?= $this->Form->create($usuario) ?>
     <fieldset>
-        <legend><?= __('Add Usuario') ?></legend>
+        
         <?php
             echo $this->Form->control('nombre');
             echo $this->Form->control('apellido');
@@ -32,6 +18,7 @@
             echo $this->Form->control('genero_id', ['options' => $generos]);
         ?>
     </fieldset>
-    <?= $this->Form->button(__('Submit')) ?>
+    <?= $this->Form->button(__('Crear')) ?>
     <?= $this->Form->end() ?>
+    </div>
 </div>

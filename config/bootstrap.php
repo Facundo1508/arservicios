@@ -221,3 +221,5 @@ Plugin::load('Migrations');
 Plugin::load('Migrations');
 
 Plugin::load('Migrations');
+
+Plugin::load('BootstrapUI');
