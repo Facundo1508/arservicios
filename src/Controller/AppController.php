@@ -40,9 +40,19 @@ class AppController extends Controller
     public function initialize()
     {
         parent::initialize();
-
         $this->loadComponent('RequestHandler');
         $this->loadComponent('Flash');
+        $this->loadComponent('Auth', [
+            'authorize' => ['Controller'],
+            'loginRedirect' => [
+                'controller' => 'Servicios',
+                'action' => 'index'
+            ],
+            'logoutRedirect' => [
+                'controller' => 'Usuarios',
+                'action' => 'login'
+            ]
+        ]);
 
         /*
          * Enable the following components for recommended CakePHP security settings.
@@ -50,6 +60,21 @@ class AppController extends Controller
          */
         //$this->loadComponent('Security');
         //$this->loadComponent('Csrf');
+    }
+
+    public function isAuthorized($user)
+    {
+        // Admin can access every action
+        if (isset($user['role']) && $user['role'] === 'admin') 
+        {
+            return true;
+        }
+        return false;
+    }
+
+    public function beforeFilter(Event $event)
+    {   
+        $this->set('current_user', $this->Auth->user());
     }
 
     /**
@@ -63,10 +88,13 @@ class AppController extends Controller
         // Note: These defaults are just to get started quickly with development
         // and should not be used in production. You should instead set "_serialize"
         // in each action as required.
+        
         if (!array_key_exists('_serialize', $this->viewVars) &&
-            in_array($this->response->type(), ['application/json', 'application/xml'])
-        ) {
+            in_array($this->response->type(), ['application/json', 'application/xml'])) 
+            {
             $this->set('_serialize', true);
         }
+        if (isset($this->Auth) && $this->Auth->user('role'))
+            $this->set("userRole", $this->Auth->user('role'));
     }
 }

@@ -2,6 +2,9 @@
 namespace App\Controller;
 
 use App\Controller\AppController;
+use Cake\Event\Event;
+use Cake\ORM\TableRegistry;
+
 
 /**
  * Usuarios Controller
@@ -12,7 +15,100 @@ use App\Controller\AppController;
  */
 class UsuariosController extends AppController
 {
+    
+    
+     public function isAuthorized($user)
+    {   
+        if (isset($user['role']) && $user['role'] === 'usuario')
+        {
+            if(in_array($this->request->action, ['home','logout', 'servicio', 'user']))
+            {
+                return true;
+            }
+        } elseif (!isset($user['role'])) {
+           if(in_array($this->request->action, ['registro', 'logout', 'login']))
+            {
+                return true;
+            }
+        }
 
+        return parent::isAuthorized($user);
+    }
+    
+    public function beforeFilter(Event $event)
+    {
+        parent::beforeFilter($event);
+        // Allow users to register and logout.
+        // You should not add the "login" action to allow list. Doing so would
+        // cause problems with normal functioning of AuthComponent.
+        $this->Auth->allow(['logout', 'registro']);
+    }
+    
+    public function registro()
+    {
+        $user = $this->Usuario->newEntity();
+        if ($this->request->is('post')) {
+            $user = $this->Usuario->patchEntity($user, $this->request->getData());    
+            $user->role = "usuario";
+            if ($this->Usuario->save($user)) {
+                $this->Flash->success(__('El usuario ha sido registrado correctamente. Está pendiente de activación.'));
+
+                return $this->redirect(['action' => 'registro']);
+            }
+            $this->Flash->error(__('El usuario no pudo ser registrado. Intente nuevamente'));
+        }
+        $this->set(compact('user'));
+        $this->set('_serialize', ['user']);
+    }
+    
+    public function login()
+    {   
+        if ($this->request->is('post')) {
+            $usuario = $this->Auth->identify();
+            if ($usuario && $usuario['activo']) {
+                $this->Auth->setUser($usuario);
+                return $this->redirect($this->Auth->redirectUrl());
+            } elseif ($usuario && ($usuario['activo'] == false)) {
+                $this->Flash->error(__('El Usuario aun no está activado.'));   
+            } else {
+                $this->Flash->error(__('Nombre de usuario o contraseña incorrectos'));
+            }
+        }
+    }
+
+    public function logout()
+    {
+        return $this->redirect($this->Auth->logout());
+    }
+    
+    
+     /**
+     * Activar method
+     *
+     * @return \Cake\Http\Response|void
+     */
+    public function activar($id = null)
+    {
+        $this->set('titulo', 'Activar Usuarios');
+
+        if ($this->request->is('post') && isset($id)) {
+            $usersTable = TableRegistry::get('Users');
+            $user = $usersTable->get($id);
+            $user->activo = 1;
+            if ($usersTable->save($user)) {
+                $this->Flash->success(__('El usuario ha sido activado correctamente.'));
+            } else {
+                $this->Flash->error(__('No se pudo activar el usuario.'));
+            }
+            return $this->redirect(['action' => 'activar']);
+        }
+
+        $this->paginate = ['finder' => 'desactivados'];
+        $users = $this->paginate($this->Users);
+
+        $this->set(compact('users'));
+        //$this->set('_serialize', ['users']);
+    }
     /**
      * Index method
      *
@@ -65,7 +161,7 @@ class UsuariosController extends AppController
         }
         $rols = $this->Usuarios->Rols->find('list', ['limit' => 200]);
         $generos = $this->Usuarios->Generos->find('list', ['limit' => 200]);
-        $this->set(compact('usuario', 'rols', 'generos'));
+        $this->set(compact('usuario', 'roles', 'generos'));
         $this->set('_serialize', ['usuario']);
     }
 
@@ -92,7 +188,7 @@ class UsuariosController extends AppController
         }
         $rols = $this->Usuarios->Rols->find('list', ['limit' => 200]);
         $generos = $this->Usuarios->Generos->find('list', ['limit' => 200]);
-        $this->set(compact('usuario', 'rols', 'generos'));
+        $this->set(compact('usuario', 'roles', 'generos'));
         $this->set('_serialize', ['usuario']);
     }
 
